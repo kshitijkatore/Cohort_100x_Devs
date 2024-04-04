@@ -152,7 +152,7 @@ function firstFunction(){
             })
         })
     })
-}
+} 
 
 firstFunction().then(function(result){
     return result;
