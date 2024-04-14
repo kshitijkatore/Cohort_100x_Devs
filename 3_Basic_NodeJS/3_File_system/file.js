@@ -4,6 +4,7 @@ const fs = require('fs');
 // fs.writeFileSync("./test.txt", "Hey there !");
 
 
+
 // asyncronous call --> Non- Blocking Operation
 
 // fs.writeFile("./test2.txt", "created with asyncronously", (err)=>{
