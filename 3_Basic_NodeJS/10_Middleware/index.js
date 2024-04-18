@@ -6,7 +6,21 @@ const PORT = 3000;
 
 
 // Middleware - Pligin
-app.use(express.urlencoded({ extended: false}))
+app.use(express.urlencoded({ extended: false}));
+
+app.use((req, res, next)=>{
+    console.log("Middleware 1");
+    req.myUserName = "Xitijkatore.dev";
+  next();
+});
+
+app.use((req, res, next)=>{
+    console.log("Middleware 2", req.myUserName);
+    fs.appendFile('./log.txt', `${Date.now()}:${req.ip}: ${req.method} :${req.path}\n`, (err, data)=>{
+        next();
+    });
+
+});
 
 //Routes
 app.get("/users", (req, res) => {
