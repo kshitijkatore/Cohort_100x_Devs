@@ -1,7 +1,12 @@
 const express = require("express");
 const users = require("./MOCK_DATA.json");
+const fs = require('fs');
 const app = express();
 const PORT = 3000;
+
+
+// Middleware - Pligin
+app.use(express.urlencoded({ extended: false}))
 
 //Routes
 app.get("/users", (req, res) => {
@@ -19,28 +24,49 @@ app.get("/api/users", (req, res) => {
   return res.json(users);
 });
 
+
 app.post("/api/users", (req, res) => {
-  // TODO: create new user
-  return res.json({ status: "pending" });
+  const body = req.body;
+  // console.log("Body", body);
+
+  users.push({...body, id: users.length + 1});
+  
+  fs.writeFile('./MOCK_DATA.json', JSON.stringify(users), (err, data)=>{
+    return res.json({status : "success", id: users.length});
+  });
 });
 
 app
   .route("/api/users/:id")
   .get((req, res) => {
-    const id = Number(req.params.id);
-    const user = users.find((user) => user.id === id);
-
-    return res.json(user);
+    const id = req.params.id;
+    const user = users.find((user) => user.id == id);
+    if (user) {
+      res.status(200).json(user); // Respond with updated user object
+    } else {
+      res.status(404).json({ error: 'User not found' }); // Respond with error if user is not found
+    }
   })
-
-  .patch((req, res) => {
-    // TODO: Edit the user with id
-
-    return res.json({ status: "pending" });
+  .patch((req, res) =>{
+    const id = req.params.id;
+    const body = req.body;
+    const user = users.find((user) => user.id == id); // Find the user by ID
+    if (user) {
+      Object.assign(user, body); // Update user object with the data from the request body
+      res.status(200).json(user); // Respond with updated user object
+    } else {
+      res.status(404).json({ error: 'User not found' }); // Respond with error if user is not found
+    }
   })
-
-  .delete("/api/user/:id", (req, res) => {
-    return res.json({ status: "pending" });
+  .delete((req, res) => {
+    const id = req.params.id;
+    const userIndex = users.findIndex((user) => user.id == id);
+    if (userIndex !== -1) {
+      users.splice(userIndex, 1);
+      res.status(200).json({ message: 'User deleted successfully' });
+    } else {
+      res.status(404).json({ error: 'User not found' });
+    }
   });
 
 app.listen(PORT, () => {
